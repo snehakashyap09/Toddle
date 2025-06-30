@@ -692,3 +692,26 @@ body {
     max-width: 200px;
   }
 }
+
+
+.module-outline{
+  width: 220px;
+  position: sticky;
+  top:80px;
+  padding-left: 20px;
+  font-size:14px
+}
+
+.outline-item{
+  padding:8px;
+  cursor:pointer;
+  border-left: 3px solid transparent;
+}
+
+.outline-item.active{
+  font-weight: bold;
+  border-left: 3px solid #e04a5a;
+  background-color: #f8f8f8;
+  
+}
+

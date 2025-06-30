@@ -1,17 +1,40 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const ModuleModal = ({ isOpen, onClose, onSave, module = null }) => {
+const ModuleModal = ({ isOpen, onClose, onSave, module = null,existingModules = [] }) => {
   const [moduleName, setModuleName] = useState(module ? module.name : '');
 
-  const handleSubmit = e => {
-    e.preventDefault();
+useEffect(()=>{
+if(isOpen ){
+  setModuleName(module ? module.name :'')
+}
 
-    onSave({
-      id: module ? module.id : Date.now().toString(),
-      name: moduleName.trim(),
-    });
-    setModuleName('');
-  };
+},[isOpen])
+
+ const handleSubmit = e => {
+  e.preventDefault();
+
+  const trimmedName = moduleName.trim();
+
+  if (!trimmedName) return;
+
+  const isDuplicate = existingModules.some(
+    m =>
+      m.name.trim().toLowerCase() === trimmedName.toLowerCase() &&
+      (!module || m.id !== module.id) 
+  );
+
+  if (isDuplicate) {
+    alert("A module with this name already exists.");
+    return;
+  }
+
+  onSave({
+    id: module ? module.id : Date.now().toString(),
+    name: trimmedName,
+  });
+
+  setModuleName('');
+};
 
   if (!isOpen) return null;
 

@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-
 const Header = ({ onAddClick }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -28,10 +27,12 @@ const Header = ({ onAddClick }) => {
   };
 
   const handleAddLink = () => {
+    onAddClick('link');
     setIsDropdownOpen(false);
   };
 
   const handleUpload = () => {
+    onAddClick('upload');
     setIsDropdownOpen(false);
   };
 
@@ -40,6 +41,7 @@ const Header = ({ onAddClick }) => {
       <h1 className="header-title">Course builder</h1>
       <div className="header-right">
         <div className="search-container">
+
           <input type="text" placeholder="Search..." className="search-input" />
         </div>
         <div className="dropdown-container" ref={dropdownRef}>

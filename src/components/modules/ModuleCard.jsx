@@ -1,5 +1,6 @@
 import { useState } from 'react';
-
+import { useDrop } from 'react-dnd';
+import { ItemTypes } from '../../constants/constants';
 import ModuleItem from './ModuleItem';
 
 const ModuleCard = ({
@@ -9,12 +10,27 @@ const ModuleCard = ({
   items = [],
   onAddItem,
   onDeleteItem,
+  onEditItem,
+  onMoveItem,
+  onReorderItem
 }) => {
   const [isOptionsOpen, setIsOptionsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
 
   const moduleItems = items.filter(item => item.moduleId === module.id);
+
+   const [{isover},dropRef] = useDrop({
+    accept: ItemTypes.ITEM,
+    drop : (draggedItem)=>{
+      if(draggedItem.moduleId !== module.id){
+        onMoveItem(draggedItem.id,module.id)
+      }
+    },
+    collect: monitor => ({
+      isOver: monitor.isOver(),
+    })
+   })
 
   const toggleOptions = e => {
     e.stopPropagation();
@@ -46,7 +62,7 @@ const ModuleCard = ({
   };
 
   return (
-    <div className="module-card-container">
+    <div className="module-card-container" ref = {dropRef}>
       <div className="module-card" onClick={toggleExpanded}>
         <div className="module-content">
           <div className="module-icon">
@@ -113,11 +129,14 @@ const ModuleCard = ({
           ) : (
             <div className="module-items">
               <div className="module-items-list">
-                {moduleItems.map(item => (
+                {moduleItems.map((item,index) => (
                   <ModuleItem
                     key={item.id}
                     item={item}
+                    index={index}
                     onDelete={onDeleteItem}
+                    onEdit = {onEditItem}
+                    onReorderItem= {onReorderItem}
                   />
                 ))}
               </div>

@@ -1,14 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const LinkModal = ({ isOpen, onClose, onSave, moduleId }) => {
+const LinkModal = ({ isOpen, onClose, onSave, moduleId,item }) => {
   const [linkTitle, setLinkTitle] = useState('');
   const [linkUrl, setLinkUrl] = useState('');
+
+
+  useEffect(()=>{
+    if(item){
+      setLinkTitle(item.title || '');
+      setLinkUrl(item.url || '');
+    }
+  },[item,isOpen])
+
+  const isValidUrl = (url)=>{
+    try{
+      new URL(url);
+      return true;
+    } catch(e){
+      return false;
+    }
+  }
 
   const handleSubmit = e => {
     e.preventDefault();
 
     onSave({
-      id: Date.now().toString(),
+      id: item ? item.id : Date.now().toString(),
       moduleId,
       type: 'link',
       title: linkTitle.trim(),
@@ -24,7 +41,7 @@ const LinkModal = ({ isOpen, onClose, onSave, moduleId }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Add a link</h2>
+          <h2>{item ? "Edit ink" : "Add new Link"}</h2>
           <button className="modal-close" onClick={onClose}>
             ×
           </button>
@@ -62,9 +79,9 @@ const LinkModal = ({ isOpen, onClose, onSave, moduleId }) => {
             <button
               type="submit"
               className="btn-create"
-              disabled={!linkTitle.trim() || !linkUrl.trim()}
+              disabled={!linkTitle.trim() || !linkUrl.trim() || !isValidUrl(linkUrl)}
             >
-              Add link
+              {item ? "Save Changes" : "Add Link"}
             </button>
           </div>
         </form>

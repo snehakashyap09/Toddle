@@ -1,8 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const UploadModal = ({ isOpen, onClose, onSave, moduleId }) => {
+const UploadModal = ({ isOpen, onClose, onSave, moduleId ,item}) => {
   const [fileTitle, setFileTitle] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
+
+useEffect(()=>{
+  if(isOpen && item){
+    setFileTitle(item.title);
+    setSelectedFile(null);
+  }
+  else if(isOpen){
+    setFileTitle('');
+    setSelectedFile(null)
+  }
+},[isOpen,item])
 
   const handleFileChange = e => {
     if (e.target.files && e.target.files[0]) {
@@ -10,19 +21,22 @@ const UploadModal = ({ isOpen, onClose, onSave, moduleId }) => {
     }
   };
 
+
   const handleSubmit = e => {
     e.preventDefault();
+
+    if(!fileTitle.trim())  return;
 
     // In a real app, you would upload the file to a server
     // Here we just create a mock file entry
     onSave({
-      id: Date.now().toString(),
+      id: item ? item.id: Date.now().toString(),
       moduleId,
       type: 'file',
       title: fileTitle.trim(),
-      fileName: selectedFile.name,
-      fileSize: selectedFile.size,
-      fileType: selectedFile.type,
+      fileName: selectedFile?.name || item.fileName || '',
+      fileSize: selectedFile?.size || item.fileSize || 0,
+      fileType: selectedFile?.type || item.fileType || '',
     });
     setFileTitle('');
     setSelectedFile(null);
@@ -34,7 +48,7 @@ const UploadModal = ({ isOpen, onClose, onSave, moduleId }) => {
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Upload file</h2>
+          <h2>{item ? "Rename file" :"Upload file"}</h2>
           <button className="modal-close" onClick={onClose}>
             ×
           </button>
@@ -53,7 +67,8 @@ const UploadModal = ({ isOpen, onClose, onSave, moduleId }) => {
                 autoFocus
               />
             </div>
-            <div className="form-group">
+
+          {!item &&( <div className="form-group">
               <label htmlFor="file-upload">Select file</label>
               <input
                 id="file-upload"
@@ -69,7 +84,9 @@ const UploadModal = ({ isOpen, onClose, onSave, moduleId }) => {
                   </span>
                 </div>
               )}
-            </div>
+            </div>)}
+           
+
           </div>
           <div className="modal-footer">
             <button type="button" className="btn-cancel" onClick={onClose}>
@@ -78,9 +95,9 @@ const UploadModal = ({ isOpen, onClose, onSave, moduleId }) => {
             <button
               type="submit"
               className="btn-create"
-              disabled={!fileTitle.trim() || !selectedFile}
+              disabled={!fileTitle.trim() || !selectedFile && !item}
             >
-              Upload
+              {item ? "Save changes" : "Upload file"}
             </button>
           </div>
         </form>
